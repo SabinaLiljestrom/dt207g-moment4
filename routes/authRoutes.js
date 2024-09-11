@@ -4,6 +4,19 @@
 
 const express = require ("express");
 const router = express.Router();
+const mongoose = require ("mongoose");
+require("dotenv").config();
+
+//coonect to mongoose
+mongoose.set("strictQuery", false);
+mongoose.connect(process.env.DATABASE).then(()=> {
+    console.log ("connected to MongoDb");
+}).catch((error) => {
+    console.error ("Error connecting to database..");
+});
+
+// user model
+const User = require("../models/User");
 
 // add new user
 router.post ("/register", async (req, res) => {
@@ -25,6 +38,9 @@ router.post ("/register", async (req, res) => {
         }
 
         // correct save user
+        const user = new User ({ username, password});
+        await user.save();
+
         res.status(201).json({message: "user created"});
     } catch (error) {
         res.status(500).json({error: "server error"});
@@ -44,15 +60,18 @@ router.post ("/login", async (req, res) =>{
         if (!password) {
             return res.status(400).json({ error: "Password is required" });
         }
-        // Kontrollera användarnamn och lösenord
-        if (username !== "Sabina") {
-            return res.status(401).json({ error: "Invalid username" });
-        }
-        if (password !== "12345678") {
-            return res.status(401).json({ error: "Invalid password" });
-        }
-        // om allt stämmer
+       //finns användare
+       const user = await User.findOne ({ username});
+       if(!user){
+        return res.status(401).json({ error : "fel användarnamn!"});
+       }
+       const isPasswordMatch = await user.comparePassword (password);
+       if(!isPasswordMatch){
+        return res.status(401).json({ error : "fel lösenord!"});
+       } else {
         res.status(200).json({ message: "Login successful" });
+       }
+       
     } catch (error) {
         res.status(500).json({error: "server error"});
     }
