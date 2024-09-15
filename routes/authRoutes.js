@@ -5,15 +5,17 @@
 const express = require ("express");
 const router = express.Router();
 const mongoose = require ("mongoose");
+const jwt = require ("jsonwebtoken");
 require("dotenv").config();
 
 //coonect to mongoose
 mongoose.set("strictQuery", false);
-mongoose.connect(process.env.DATABASE).then(()=> {
-    console.log ("connected to MongoDb");
+mongoose.connect(process.env.DATABASE).then(() => {
+    console.log("connected to MongoDb");
 }).catch((error) => {
-    console.error ("Error connecting to database..");
+    console.error("Error connecting to database:", error.message);
 });
+
 
 // user model
 const User = require("../models/User");
@@ -69,7 +71,14 @@ router.post ("/login", async (req, res) =>{
        if(!isPasswordMatch){
         return res.status(401).json({ error : "fel lösenord!"});
        } else {
-        res.status(200).json({ message: "Login successful" });
+        //skapa jwt
+        const payload = { username: username};
+        const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {expiresIn: '1h'});
+        const response = {
+            message: "User logged in!",
+            token: token
+        }
+        res.status(200).json({ response });
        }
        
     } catch (error) {
