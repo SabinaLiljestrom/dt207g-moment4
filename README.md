@@ -13,7 +13,7 @@ Nedan finns beskrivet hur man använder webbtjänsten på olika vis:
 | GET           | /api/protected          | Åtkomst till en skyddad resurs. Kräver JWT-token i Authorization-headern.|
 | POST           | /api/login      |   	Loggar in användare och returnerar en JWT-token. Kräver att objekt skickas med.|
 | POST          | /api/register     |    Skapar ny användare. Kräver att ett objekt skickas med. |
-| PUT           | /api/users/:id    |    Uppdaterar användardata (t.ex. användarnamn eller lösenord). Kräver att ett bjekt skickas med. |
+
 
 
 

@@ -7,12 +7,19 @@ const express = require("express");
 const bodyParser = require ("body-parser");
 const authRoutes = require ("./routes/authRoutes");
 const jwt = require("jsonwebtoken");
+const cors = require('cors');
 require("dotenv").config();
 
 //init express
 const app = express ();
 let port = process.env.PORT || 3000;
 app.use(bodyParser.json());
+app.use(cors({
+  origin: '*', // Tillåt alla ursprung
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Tillåt dessa metoder
+  allowedHeaders: ['Content-Type', 'Authorization'] // Tillåt dessa headers
+}));
+
 
 //routes
 app.use("/api", authRoutes);

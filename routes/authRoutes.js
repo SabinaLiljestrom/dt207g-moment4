@@ -49,41 +49,41 @@ router.post ("/register", async (req, res) => {
     }
 });
 
-//login user
-router.post ("/login", async (req, res) =>{
+// login user
+router.post("/login", async (req, res) => {
     try {
-        const{ username, password } = req.body;
-        // validera input
-        // Validera användarnamn
+        const { username, password } = req.body;
+
         if (!username) {
             return res.status(400).json({ error: "Username is required" });
         }
-        // Validera lösenord
+
         if (!password) {
             return res.status(400).json({ error: "Password is required" });
         }
-       //finns användare
-       const user = await User.findOne ({ username});
-       if(!user){
-        return res.status(401).json({ error : "fel användarnamn!"});
-       }
-       const isPasswordMatch = await user.comparePassword (password);
-       if(!isPasswordMatch){
-        return res.status(401).json({ error : "fel lösenord!"});
-       } else {
-        //skapa jwt
-        const payload = { username: username};
-        const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, {expiresIn: '1h'});
-        const response = {
+
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.status(401).json({ error: "Invalid username" });
+        }
+
+        const isPasswordMatch = await user.comparePassword(password);
+        if (!isPasswordMatch) {
+            return res.status(401).json({ error: "Invalid password" });
+        }
+
+        const payload = { username: username };
+        const token = jwt.sign(payload, process.env.JWT_SECRET_KEY, { expiresIn: '1h' });
+
+        res.status(200).json({
             message: "User logged in!",
             token: token
-        }
-        res.status(200).json({ response });
-       }
-       
+        });
+
     } catch (error) {
-        res.status(500).json({error: "server error"});
+        res.status(500).json({ error: "Server error" });
     }
 });
+
 
 module.exports = router;
